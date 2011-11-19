@@ -16,6 +16,34 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+(defvar hl-region-overlay
+  nil
+  "The current overlay.")
+(make-local-variable 'hl-region-overlay)
 
+(define-minor-mode highlight-region-mode
+    "Minor mode to highlight the current zone according to its
+    context.
+
+ie: sexp, comment, string."
+  nil
+  " hl-r"
+  nil
+  (if highlight-region-mode
+      (progn
+        (hl-region-create-overlay)
+        (add-hook 'post-command-hook 'hl-region-highlight nil t))
+      (hl-region-delete-overlay)
+      (kill-local-variable 'hl-region-overlay)
+      (remove-hook 'post-command-hook 'hl-region-highlight t)))
+
+(defun hl-region-create-overlay ()
+  nil)
+
+(defun hl-region-highlight ()
+  nil)
+
+(defun hl-region-delete-overlay ()
+  nil)
 
 (provide 'highlight-region)
