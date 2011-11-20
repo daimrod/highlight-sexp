@@ -77,19 +77,21 @@ ie: sexp, comment, string."
     ;; HACKY HACK just in case, this avoid to go further.
     (cond ((not (or (eq text-property 'font-lock-string-face)
                     (eq text-property 'font-lock-comment-face)))
-           (let* ((sppss (syntax-ppss))
-                  (start (elt sppss 1))
-                  (inside-a-string? (elt sppss 3))
-                  (inside-a-comment? (elt sppss 4))
-                  end)
-             ;; 'font-lock-****-face isn't really to be trusted
-             (cond ((not (or (not start)
-                             inside-a-string?
-                             inside-a-comment?))
-                    (setf end (scan-sexps start 1))
-                    (when end
-                      (move-overlay hl-region-overlay (1+ start) (1- end))))
-                   (t (move-overlay hl-region-overlay 0 0)))))
+           (save-excursion
+            (ignore-errors
+             (let* ((sppss (syntax-ppss))
+                    (start (elt sppss 1))
+                    (inside-a-string? (elt sppss 3))
+                    (inside-a-comment? (elt sppss 4))
+                    end)
+               ;; 'font-lock-****-face isn't really to be trusted
+               (cond ((not (or (not start)
+                               inside-a-string?
+                               inside-a-comment?))
+                      (setf end (scan-sexps start 1))
+                      (when end
+                        (move-overlay hl-region-overlay (1+ start) (1- end))))
+                     (t (move-overlay hl-region-overlay 0 0)))))))
           (t (move-overlay hl-region-overlay 0 0)))))
 
 (defun hl-region-create-overlay ()
