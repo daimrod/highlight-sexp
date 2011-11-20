@@ -1,4 +1,4 @@
-;; highlight-region.el
+;; highlight-sexp.el
 ;; Copyright (C) 2011 Grégoire Jadi
 
 ;; Author: Grégoire Jadi <gregoire.jadi@gmail.com>
@@ -18,35 +18,35 @@
 
 (eval-when-compile (require 'cl))
 
-(defgroup highlight-region nil
-  "Highlight region"
+(defgroup highlight-sexp nil
+  "Highlight sexp"
   :group 'faces
   :group 'matching)
 
-(defvar hl-region-overlay
+(defvar hl-sexp-overlay
   nil
   "The current overlay.")
-(make-variable-buffer-local 'hl-region-overlay)
+(make-variable-buffer-local 'hl-sexp-overlay)
 
-(defcustom hl-region-background-color
+(defcustom hl-sexp-background-color
   "#4b3b4b"
-  "*The color used for the background of the highlighted region."
+  "*The color used for the background of the highlighted sexp."
   :type 'color
-  :group 'highlight-region)
+  :group 'highlight-sexp)
 
-(defcustom hl-region-foreground-color
+(defcustom hl-sexp-foreground-color
   nil
-  "*The color used for the foreground of the highlighted region"
+  "*The color used for the foreground of the highlighted sexp"
   :type 'color
-  :group 'highlight-region)
+  :group 'highlight-sexp)
 
-(make-face 'hl-region-face)
-(defcustom hl-region-face
+(make-face 'hl-sexp-face)
+(defcustom hl-sexp-face
   nil
-  "*The face used for the highlighted region."
-  :group 'highlight-region)
+  "*The face used for the highlighted sexp."
+  :group 'highlight-sexp)
 
-(define-minor-mode highlight-region-mode
+(define-minor-mode highlight-sexp-mode
     "Minor mode to highlight the current zone according to its
     context.
 
@@ -54,25 +54,25 @@ ie: sexp, comment, string."
   nil
   " hl-r"
   nil
-  (if highlight-region-mode
+  (if highlight-sexp-mode
       (progn
-        (hl-region-create-overlay)
-        (add-hook 'post-command-hook 'hl-region-highlight nil t))
-      (hl-region-delete-overlay)
-      (kill-local-variable 'hl-region-overlay)
-      (remove-hook 'post-command-hook 'hl-region-highlight t)))
+        (hl-sexp-create-overlay)
+        (add-hook 'post-command-hook 'hl-sexp-highlight nil t))
+      (hl-sexp-delete-overlay)
+      (kill-local-variable 'hl-sexp-overlay)
+      (remove-hook 'post-command-hook 'hl-sexp-highlight t)))
 
-(define-globalized-minor-mode global-highlight-region-mode
-    highlight-region-mode
+(define-globalized-minor-mode global-highlight-sexp-mode
+    highlight-sexp-mode
   (lambda ()
-    (highlight-region-mode t)))
+    (highlight-sexp-mode t)))
 
-(defun hl-region-delete-overlay ()
-  (if hl-region-overlay
-      (delete-overlay hl-region-overlay))
-  (setf hl-region-overlay nil))
+(defun hl-sexp-delete-overlay ()
+  (if hl-sexp-overlay
+      (delete-overlay hl-sexp-overlay))
+  (setf hl-sexp-overlay nil))
 
-(defun hl-region-highlight ()
+(defun hl-sexp-highlight ()
   (let ((text-property (get-text-property (point) 'face)))
     ;; HACKY HACK just in case, this avoid to go further.
     (cond ((not (or (eq text-property 'font-lock-string-face)
@@ -91,20 +91,20 @@ ie: sexp, comment, string."
                       (ignore-errors
                        (setf end (scan-sexps start 1)))
                       (cond (end
-                             (move-overlay hl-region-overlay (1+ start) (1- end)))
+                             (move-overlay hl-sexp-overlay (1+ start) (1- end)))
                             (t
-                             (move-overlay hl-region-overlay (1+ start) (point)))))
-                     (t (move-overlay hl-region-overlay 0 0)))))))
-          (t (move-overlay hl-region-overlay 0 0)))))
+                             (move-overlay hl-sexp-overlay (1+ start) (point)))))
+                     (t (move-overlay hl-sexp-overlay 0 0)))))))
+          (t (move-overlay hl-sexp-overlay 0 0)))))
 
-(defun hl-region-create-overlay ()
+(defun hl-sexp-create-overlay ()
   (let (attribute)
-    (setf attribute (face-attr-construct 'hl-region-face))
-    (if hl-region-foreground-color
-        (setf attribute (plist-put attribute :foreground hl-region-foreground-color)))
-    (if hl-region-background-color
-        (setf attribute (plist-put attribute :background hl-region-background-color)))
-    (setf hl-region-overlay (make-overlay 0 0))
-    (overlay-put hl-region-overlay 'face attribute)))
+    (setf attribute (face-attr-construct 'hl-sexp-face))
+    (if hl-sexp-foreground-color
+        (setf attribute (plist-put attribute :foreground hl-sexp-foreground-color)))
+    (if hl-sexp-background-color
+        (setf attribute (plist-put attribute :background hl-sexp-background-color)))
+    (setf hl-sexp-overlay (make-overlay 0 0))
+    (overlay-put hl-sexp-overlay 'face attribute)))
 
-(provide 'highlight-region)
+(provide 'highlight-sexp)
