@@ -69,19 +69,21 @@ ie: sexp, comment, string."
 
 (defun hl-region-highlight ()
   (let ((text-property (get-text-property (point) 'face)))
-    (unless (or (eq text-property 'font-lock-string-face)
-                (eq text-property 'font-lock-comment-face))
-      (let* ((sppss (syntax-ppss))
-             (start (elt sppss 1))
-             (inside-a-string? (elt sppss 3))
-             (inside-a-comment? (elt sppss 4))
-             end)
-        (unless (or (not start)
-                    inside-a-string?
-                    inside-a-comment?)
-          (setf end (scan-sexps start 1))
-          (when end
-            (move-overlay hl-region-overlay start end)))))))
+    (cond ((not (or (eq text-property 'font-lock-string-face)
+                    (eq text-property 'font-lock-comment-face)))
+           (let* ((sppss (syntax-ppss))
+                  (start (elt sppss 1))
+                  (inside-a-string? (elt sppss 3))
+                  (inside-a-comment? (elt sppss 4))
+                  end)
+             (cond ((not (or (not start)
+                             inside-a-string?
+                             inside-a-comment?))
+                    (setf end (scan-sexps start 1))
+                    (when end
+                      (move-overlay hl-region-overlay start end)))
+                   (t (move-overlay hl-region-overlay 0 0)))))
+          (t (move-overlay hl-region-overlay 0 0)))))
 
 (defun hl-region-create-overlay ()
   (let (attribute)
