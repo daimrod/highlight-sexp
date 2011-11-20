@@ -48,11 +48,9 @@
 
 (define-minor-mode highlight-sexp-mode
     "Minor mode to highlight the current zone according to its
-    context.
-
-ie: sexp, comment, string."
+    context, i.e. sexp, comment, string."
   nil
-  " hl-r"
+  " hl-sexp"
   nil
   (if highlight-sexp-mode
       (progn
@@ -74,9 +72,11 @@ ie: sexp, comment, string."
 
 (defun hl-sexp-highlight ()
   (let ((text-property (get-text-property (point) 'face)))
-    ;; HACKY HACK just in case, this avoid to go further.
-    (cond ((not (or (eq text-property 'font-lock-string-face)
-                    (eq text-property 'font-lock-comment-face)))
+    ;; HACKY HACK: just in case, this avoid to go further.
+    (cond ((or (eq text-property 'font-lock-string-face)
+                (eq text-property 'font-lock-comment-face))
+           (move-overlay hl-sexp-overlay 0 0))
+          (t
            (save-excursion
             (ignore-errors
              (let* ((sppss (syntax-ppss))
@@ -94,8 +94,7 @@ ie: sexp, comment, string."
                              (move-overlay hl-sexp-overlay (1+ start) (1- end)))
                             (t
                              (move-overlay hl-sexp-overlay (1+ start) (point)))))
-                     (t (move-overlay hl-sexp-overlay 0 0)))))))
-          (t (move-overlay hl-sexp-overlay 0 0)))))
+                     (t (move-overlay hl-sexp-overlay 0 0))))))))))
 
 (defun hl-sexp-create-overlay ()
   (let (attribute)
