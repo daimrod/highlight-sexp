@@ -16,8 +16,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(eval-when-compile (require 'cl))
-
 (defgroup highlight-sexp nil
   "Highlight sexp"
   :group 'faces
@@ -68,7 +66,7 @@
 (defun hl-sexp-delete-overlay ()
   (if hl-sexp-overlay
       (delete-overlay hl-sexp-overlay))
-  (setf hl-sexp-overlay nil))
+  (setq hl-sexp-overlay nil))
 
 (defun hl-sexp-highlight ()
   (let ((text-property (get-text-property (point) 'face)))
@@ -89,7 +87,7 @@
                            (not inside-a-string?)
                            (not inside-a-comment?))
                       (ignore-errors
-                       (setf end (scan-sexps start 1)))
+                       (setq end (scan-sexps start 1)))
                       (cond (end
                              (move-overlay hl-sexp-overlay (1+ start) (1- end)))
                             (t
@@ -98,12 +96,12 @@
 
 (defun hl-sexp-create-overlay ()
   (let (attribute)
-    (setf attribute (face-attr-construct 'hl-sexp-face))
+    (setq attribute (face-attr-construct 'hl-sexp-face))
     (if hl-sexp-foreground-color
-        (setf attribute (plist-put attribute :foreground hl-sexp-foreground-color)))
+        (setq attribute (plist-put attribute :foreground hl-sexp-foreground-color)))
     (if hl-sexp-background-color
-        (setf attribute (plist-put attribute :background hl-sexp-background-color)))
-    (setf hl-sexp-overlay (make-overlay 0 0))
+        (setq attribute (plist-put attribute :background hl-sexp-background-color)))
+    (setq hl-sexp-overlay (make-overlay 0 0))
     (overlay-put hl-sexp-overlay 'face attribute)))
 
 (provide 'highlight-sexp)
