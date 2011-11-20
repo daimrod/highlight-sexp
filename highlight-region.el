@@ -16,10 +16,35 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+(eval-when-compile (require 'cl))
+
+(defgroup highlight-region nil
+  "Highlight region"
+  :group 'faces
+  :group 'matching)
+
 (defvar hl-region-overlay
   nil
   "The current overlay.")
 (make-local-variable 'hl-region-overlay)
+
+(defcustom hl-region-background-color
+  "#4b3b4b"
+  "*The color used for the background of the highlighted region."
+  :type 'color
+  :group 'highlight-region)
+
+(defcustom hl-region-foreground-color
+  nil
+  "*The color used for the foreground of the highlighted region"
+  :type 'color
+  :group 'highlight-region)
+
+(make-face 'hl-region-face)
+(defcustom hl-region-face
+  nil
+  "*The face used for the highlighted region."
+  :group 'highlight-region)
 
 (define-minor-mode highlight-region-mode
     "Minor mode to highlight the current zone according to its
@@ -37,13 +62,35 @@ ie: sexp, comment, string."
       (kill-local-variable 'hl-region-overlay)
       (remove-hook 'post-command-hook 'hl-region-highlight t)))
 
-(defun hl-region-create-overlay ()
-  nil)
+(defun hl-region-delete-overlay ()
+  (if hl-region-overlay
+      (delete-overlay hl-region-overlay))
+  (setf hl-region-overlay nil))
 
 (defun hl-region-highlight ()
-  nil)
+  (let ((text-property (get-text-property (point) 'face)))
+    (unless (or (eq text-property 'font-lock-string-face)
+                (eq text-property 'font-lock-comment-face))
+      (let* ((sppss (syntax-ppss))
+             (start (elt sppss 1))
+             (inside-a-string? (elt sppss 3))
+             (inside-a-comment? (elt sppss 4))
+             end)
+        (unless (or (not start)
+                    inside-a-string?
+                    inside-a-comment?)
+          (setf end (scan-sexps start 1))
+          (when end
+            (move-overlay hl-region-overlay start end)))))))
 
-(defun hl-region-delete-overlay ()
-  nil)
+(defun hl-region-create-overlay ()
+  (let (attribute)
+    (setf attribute (face-attr-construct 'hl-region-face))
+    (if hl-region-foreground-color
+        (setf attribute (plist-put attribute :foreground hl-region-foreground-color)))
+    (if hl-region-background-color
+        (setf attribute (plist-put attribute :background hl-region-background-color)))
+    (setf hl-region-overlay (make-overlay 0 0))
+    (overlay-put hl-region-overlay 'face attribute)))
 
 (provide 'highlight-region)
