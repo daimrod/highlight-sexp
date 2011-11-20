@@ -85,12 +85,15 @@ ie: sexp, comment, string."
                     (inside-a-comment? (elt sppss 4))
                     end)
                ;; 'font-lock-****-face isn't really to be trusted
-               (cond ((not (or (not start)
-                               inside-a-string?
-                               inside-a-comment?))
-                      (setf end (scan-sexps start 1))
-                      (when end
-                        (move-overlay hl-region-overlay (1+ start) (1- end))))
+               (cond ((and start
+                           (not inside-a-string?)
+                           (not inside-a-comment?))
+                      (ignore-errors
+                       (setf end (scan-sexps start 1)))
+                      (cond (end
+                             (move-overlay hl-region-overlay (1+ start) (1- end)))
+                            (t
+                             (move-overlay hl-region-overlay (1+ start) (point)))))
                      (t (move-overlay hl-region-overlay 0 0)))))))
           (t (move-overlay hl-region-overlay 0 0)))))
 
