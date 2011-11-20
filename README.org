@@ -1,4 +1,4 @@
-* Presentation
+* Highlight s-exp
   Highlight-sexp-mode is a minor mode for GNU/Emacs that highlights
   the s-exp at the current position.
 
