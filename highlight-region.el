@@ -26,7 +26,7 @@
 (defvar hl-region-overlay
   nil
   "The current overlay.")
-(make-local-variable 'hl-region-overlay)
+(make-variable-buffer-local 'hl-region-overlay)
 
 (defcustom hl-region-background-color
   "#4b3b4b"
@@ -62,6 +62,11 @@ ie: sexp, comment, string."
       (kill-local-variable 'hl-region-overlay)
       (remove-hook 'post-command-hook 'hl-region-highlight t)))
 
+(define-globalized-minor-mode global-highlight-region-mode
+    highlight-region-mode
+  (lambda ()
+    (highlight-region-mode t)))
+
 (defun hl-region-delete-overlay ()
   (if hl-region-overlay
       (delete-overlay hl-region-overlay))
@@ -69,6 +74,7 @@ ie: sexp, comment, string."
 
 (defun hl-region-highlight ()
   (let ((text-property (get-text-property (point) 'face)))
+    ;; HACKY HACK just in case, this avoid to go further.
     (cond ((not (or (eq text-property 'font-lock-string-face)
                     (eq text-property 'font-lock-comment-face)))
            (let* ((sppss (syntax-ppss))
@@ -76,12 +82,13 @@ ie: sexp, comment, string."
                   (inside-a-string? (elt sppss 3))
                   (inside-a-comment? (elt sppss 4))
                   end)
+             ;; 'font-lock-****-face isn't really to be trusted
              (cond ((not (or (not start)
                              inside-a-string?
                              inside-a-comment?))
                     (setf end (scan-sexps start 1))
                     (when end
-                      (move-overlay hl-region-overlay start end)))
+                      (move-overlay hl-region-overlay (1+ start) (1- end))))
                    (t (move-overlay hl-region-overlay 0 0)))))
           (t (move-overlay hl-region-overlay 0 0)))))
 
