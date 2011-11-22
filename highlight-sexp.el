@@ -24,7 +24,6 @@
 (defvar hl-sexp-overlay
   nil
   "The current overlay.")
-(make-variable-buffer-local 'hl-sexp-overlay)
 
 (defcustom hl-sexp-background-color
   "#4b3b4b"
@@ -53,10 +52,13 @@
   (if highlight-sexp-mode
       (progn
         (hl-sexp-create-overlay)
-        (add-hook 'post-command-hook 'hl-sexp-highlight nil t))
+        (add-hook 'post-command-hook 'hl-sexp-highlight nil t)
+        (add-hook 'clone-indirect-buffer-hook 'hl-sexp-handle-clone-indirect-buffer nil t))
       (hl-sexp-delete-overlay)
       (kill-local-variable 'hl-sexp-overlay)
-      (remove-hook 'post-command-hook 'hl-sexp-highlight t)))
+      (remove-hook 'post-command-hook 'hl-sexp-highlight t)
+      (remove-hook 'clone-indirect-buffer-hook 'hl-sexp-handle-clone-indirect-buffer t))
+)
 
 (define-globalized-minor-mode global-highlight-sexp-mode
     highlight-sexp-mode
@@ -101,7 +103,29 @@
         (setq attribute (plist-put attribute :foreground hl-sexp-foreground-color)))
     (if hl-sexp-background-color
         (setq attribute (plist-put attribute :background hl-sexp-background-color)))
-    (setq hl-sexp-overlay (make-overlay 0 0))
+    (set (make-local-variable 'hl-sexp-overlay) (make-overlay 0 0))
     (overlay-put hl-sexp-overlay 'face attribute)))
+
+(defun hl-sexp-handle-clone-indirect-buffer ()
+  "Set hl-sexp-overlay correctly when the buffer is cloned."
+  (set (make-local-variable 'hl-sexp-overlay) (copy-overlay hl-sexp-overlay))
+  (move-overlay hl-sexp-overlay
+                (overlay-start hl-sexp-overlay)
+                (overlay-end hl-sexp-overlay)
+                (current-buffer))
+  (dolist (something (overlay-lists))
+    ;; This is really dirty but `overlay-lists` doesn't return a list
+    ;; of list of overlay, but a mix of it.
+    (cond ((listp something)
+           (dolist (overlay something)
+             (if (and
+                  (not (eq overlay hl-sexp-overlay))
+                  (equal overlay hl-sexp-overlay))
+                 (delete-overlay overlay))))
+          ((overlayp something)
+           (if (and
+                (not (eq something hl-sexp-overlay))
+                (equal something hl-sexp-overlay))
+               (delete-overlay something))))))
 
 (provide 'highlight-sexp)
