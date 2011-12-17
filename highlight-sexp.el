@@ -97,8 +97,7 @@
                      (t (move-overlay hl-sexp-overlay 0 0))))))))))
 
 (defun hl-sexp-create-overlay ()
-  (let (attribute)
-    (setq attribute (face-attr-construct 'hl-sexp-face))
+  (let ((attribute (face-attr-construct 'hl-sexp-face)))
     (if hl-sexp-foreground-color
         (setq attribute (plist-put attribute :foreground hl-sexp-foreground-color)))
     (if hl-sexp-background-color
