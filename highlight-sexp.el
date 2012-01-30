@@ -1,4 +1,5 @@
-;; highlight-sexp.el
+;;; highlight-sexp.el --- highlight current zone according to its context
+
 ;; Copyright (C) 2011 Grégoire Jadi
 
 ;; Author: Grégoire Jadi <gregoire.jadi@gmail.com>
