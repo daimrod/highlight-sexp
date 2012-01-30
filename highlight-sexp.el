@@ -17,6 +17,14 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+
+;; Highlight-sexp-mode highlights the s-exp at the current position.
+;; This mode is heavily inspired by highlight-parentheses-mode which
+;; highlights all parentheses but not the s-exp.
+
+;;; Code:
+
 (defgroup highlight-sexp nil
   "Highlight sexp"
   :group 'faces
@@ -129,3 +137,5 @@
                (delete-overlay something))))))
 
 (provide 'highlight-sexp)
+
+;;; highlight-sexp.el ends here
