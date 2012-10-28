@@ -53,7 +53,7 @@
   :group 'highlight-sexp)
 
 (define-minor-mode highlight-sexp-mode
-    "Minor mode to highlight the current zone according to its
+  "Minor mode to highlight the current zone according to its
     context, i.e. sexp, comment, string."
   nil
   " hl-sexp"
@@ -63,14 +63,14 @@
         (hl-sexp-create-overlay)
         (add-hook 'post-command-hook 'hl-sexp-highlight nil t)
         (add-hook 'clone-indirect-buffer-hook 'hl-sexp-handle-clone-indirect-buffer nil t))
-      (hl-sexp-delete-overlay)
-      (kill-local-variable 'hl-sexp-overlay)
-      (remove-hook 'post-command-hook 'hl-sexp-highlight t)
-      (remove-hook 'clone-indirect-buffer-hook 'hl-sexp-handle-clone-indirect-buffer t))
-)
+    (hl-sexp-delete-overlay)
+    (kill-local-variable 'hl-sexp-overlay)
+    (remove-hook 'post-command-hook 'hl-sexp-highlight t)
+    (remove-hook 'clone-indirect-buffer-hook 'hl-sexp-handle-clone-indirect-buffer t))
+  )
 
 (define-globalized-minor-mode global-highlight-sexp-mode
-    highlight-sexp-mode
+  highlight-sexp-mode
   (lambda ()
     (highlight-sexp-mode t)))
 
@@ -83,27 +83,27 @@
   (let ((text-property (get-text-property (point) 'face)))
     ;; HACKY HACK: just in case, this avoid to go further.
     (cond ((or (eq text-property 'font-lock-string-face)
-                (eq text-property 'font-lock-comment-face))
+               (eq text-property 'font-lock-comment-face))
            (move-overlay hl-sexp-overlay 0 0))
           (t
            (save-excursion
-            (ignore-errors
-             (let* ((sppss (syntax-ppss))
-                    (start (elt sppss 1))
-                    (inside-a-string? (elt sppss 3))
-                    (inside-a-comment? (elt sppss 4))
-                    end)
-               ;; 'font-lock-****-face isn't really to be trusted
-               (cond ((and start
-                           (not inside-a-string?)
-                           (not inside-a-comment?))
-                      (ignore-errors
-                       (setq end (scan-sexps start 1)))
-                      (cond (end
-                             (move-overlay hl-sexp-overlay (1+ start) (1- end)))
-                            (t
-                             (move-overlay hl-sexp-overlay (1+ start) (point)))))
-                     (t (move-overlay hl-sexp-overlay 0 0))))))))))
+             (ignore-errors
+               (let* ((sppss (syntax-ppss))
+                      (start (elt sppss 1))
+                      (inside-a-string? (elt sppss 3))
+                      (inside-a-comment? (elt sppss 4))
+                      end)
+                 ;; 'font-lock-****-face isn't really to be trusted
+                 (cond ((and start
+                             (not inside-a-string?)
+                             (not inside-a-comment?))
+                        (ignore-errors
+                          (setq end (scan-sexps start 1)))
+                        (cond (end
+                               (move-overlay hl-sexp-overlay (1+ start) (1- end)))
+                              (t
+                               (move-overlay hl-sexp-overlay (1+ start) (point)))))
+                       (t (move-overlay hl-sexp-overlay 0 0))))))))))
 
 (defun hl-sexp-create-overlay ()
   (let ((attribute (face-attr-construct 'hl-sexp-face)))
