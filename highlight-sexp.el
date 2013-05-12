@@ -83,7 +83,8 @@
   (let ((text-property (get-text-property (point) 'face)))
     ;; HACKY HACK: just in case, this avoid to go further.
     (cond ((or (eq text-property 'font-lock-string-face)
-               (eq text-property 'font-lock-comment-face))
+               (eq text-property 'font-lock-comment-face)
+               (eq text-property 'font-lock-doc-face))
            (move-overlay hl-sexp-overlay 0 0))
           (t
            (save-excursion
