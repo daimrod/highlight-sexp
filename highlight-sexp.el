@@ -3,6 +3,9 @@
 ;; Copyright (C) 2011-2014 Grégoire Jadi
 
 ;; Author: Grégoire Jadi <gregoire.jadi@gmail.com>
+;; Version: 1.0
+;; Keywords: highlight
+;; URL: https://github.com/daimrod/highlight-sexp
 
 ;; This program is free software: you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -52,6 +55,7 @@
   "*The face used for the highlighted sexp."
   :group 'highlight-sexp)
 
+;;;###autoload
 (define-minor-mode highlight-sexp-mode
   "Minor mode to highlight the current zone according to its
     context, i.e. sexp, comment, string."
@@ -69,6 +73,7 @@
     (remove-hook 'clone-indirect-buffer-hook 'hl-sexp-handle-clone-indirect-buffer t))
   )
 
+;;;###autoload
 (define-globalized-minor-mode global-highlight-sexp-mode
   highlight-sexp-mode
   (lambda ()
